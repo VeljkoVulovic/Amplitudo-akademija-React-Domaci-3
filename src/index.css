@@ -1,0 +1,126 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Helvetica;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: url("./background.jpg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  backdrop-filter: blur(2px);
+  min-height: 100vh;
+}
+
+code {
+  font-family: Helvetica, Arial, Sans-Serif;
+}
+
+a {
+  color: black;
+  text-decoration: none;
+}
+
+.card {
+  transition: 0.3s;
+  width: 250px;
+  height: 220px;
+  padding: 15px;
+  border: 1px solid #3f51b5;
+  background-color: rgb(200, 200, 200);
+  border-radius: 10px;
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px,
+    rgba(17, 17, 26, 0.1) 0px 16px 56px, rgba(17, 17, 26, 0.1) 0px 24px 80px;
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  transform: scale(1.04);
+  cursor: pointer;
+  transition: 0.4s ease all;
+}
+
+.card-header {
+  height: 38px;
+  font-size: 19px;
+  padding-top: 20px;
+}
+
+.card-hr {
+  display: block;
+  border: none;
+  margin-bottom: 15px;
+  height: 3px;
+  background-color: rgb(221, 128, 117);
+  -webkit-animation-name: line-show;
+  -webkit-animation-duration: 0.3s;
+  animation-name: line-show;
+  animation-duration: 0.3s;
+  -webkit-transition-timing-function: cubic-bezier(0.795, 0, 0.165, 1);
+  -o-transition-timing-function: cubic-bezier(0.795, 0, 0.165, 1);
+  transition-timing-function: cubic-bezier(0.795, 0, 0.165, 1);
+}
+
+.card-info {
+  text-align: left;
+  font-style: italic;
+}
+.card-info div {
+  padding-bottom: 3px;
+  margin-bottom: 3px;
+  background-image: linear-gradient(
+    to right,
+    #3f51b5 33%,
+    rgba(255, 255, 255, 0) 0%
+  );
+  background-position: bottom;
+  background-size: 3px 1px;
+  background-repeat: repeat-x;
+}
+
+.card-info div:last-child {
+  background-image: none;
+}
+
+.buttonDiv {
+  width: 180px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.styleDiv {
+  width: 300px;
+  text-align: center;
+  border: 1px solid #3f51b5;
+  background-color: rgb(224, 222, 222);
+  padding: 35px;
+  border-radius: 10px;
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px,
+    rgba(17, 17, 26, 0.1) 0px 16px 56px, rgba(17, 17, 26, 0.1) 0px 24px 80px;
+}
+
+.formDiv {
+  margin: 80px auto;
+}
+
+.formDiv div {
+  margin-bottom: 10px;
+}
+
+.centerDiv {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.centerDiv div {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 700px) {
+  .styleDiv {
+    width: 250px;
+  }
+}
