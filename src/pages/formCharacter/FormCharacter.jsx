@@ -23,6 +23,28 @@ import {
   editCharacter,
   addCharacter,
 } from "../../services/characters";
+import Modal from "@material-ui/core/Modal";
+import Backdrop from "@material-ui/core/Backdrop";
+import Fade from "@material-ui/core/Fade";
+
+const useStyles = makeStyles((theme) => ({
+  button: {
+    margin: theme.spacing(1),
+  },
+  modal: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  paper: {
+    textAlign: "center",
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #000",
+    borderRadius: "10px",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
+}));
 
 const FormCharacter = (props) => {
   const character = props.location.character;
@@ -34,6 +56,16 @@ const FormCharacter = (props) => {
   const [dateOfBirth, setDateOfBirth] = useState(null);
   const [gender, setGender] = useState("");
   const [occupation, setOccupation] = useState("");
+  const [open, setOpen] = useState(false);
+  const classes = useStyles();
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleChange = (event) => {
     setGender(event.target.value);
@@ -42,13 +74,6 @@ const FormCharacter = (props) => {
   const handleDateChange = (date) => {
     setDateOfBirth(date);
   };
-
-  const useStyles = makeStyles((theme) => ({
-    button: {
-      margin: theme.spacing(1),
-    },
-  }));
-  const classes = useStyles();
 
   useEffect(() => {
     if (character != null) {
@@ -209,12 +234,44 @@ const FormCharacter = (props) => {
             startIcon={<DeleteIcon />}
             variant="contained"
             color="secondary"
-            onClick={() => onDelete(id)}
+            onClick={() => handleOpen()}
           >
             Delete
           </Button>
         </div>
       ) : null}
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        className={classes.modal}
+        open={open}
+        onClose={handleClose}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={open}>
+          <div className={classes.paper}>
+            <h2 id="transition-modal-title">Please Confirm!</h2>
+            <p id="transition-modal-description">
+              Are you sure you want to delete{" "}
+              <u>
+                {firstName} {lastName}
+              </u>
+              ?
+            </p>
+            <Button
+              startIcon={<DeleteIcon />}
+              variant="contained"
+              onClick={() => onDelete(id)}
+            >
+              Delete
+            </Button>
+          </div>
+        </Fade>
+      </Modal>
     </div>
   );
 };
