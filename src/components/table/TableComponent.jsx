@@ -43,14 +43,16 @@ const TableComponent = ({ headers = [], rows = [] }) => {
     <TableContainer>
       <Table className={classes.table} aria-label="customized table">
         <TableHead>
-          <TableRow>
+          <StyledTableRow>
             {headers?.length &&
-              headers.map((item, index) => (
-                <StyledTableCell key={index} align="center">
-                  {item.title}
-                </StyledTableCell>
-              ))}
-          </TableRow>
+              headers.map((item, index) => {
+                return (
+                  <StyledTableCell key={index} align="center">
+                    {item.title}
+                  </StyledTableCell>
+                );
+              })}
+          </StyledTableRow>
         </TableHead>
         <TableBody>
           {rows?.length &&
