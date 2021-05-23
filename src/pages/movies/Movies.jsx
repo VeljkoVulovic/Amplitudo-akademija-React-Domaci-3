@@ -4,7 +4,7 @@ import Wrapper from "../../components/wrapper/Wrapper";
 import { Button } from "@material-ui/core";
 import { useHistory, Link } from "react-router-dom";
 import AddBoxIcon from "@material-ui/icons/AddBox";
-import { getAllMovies } from "../../services/movies";
+import { getAllMovies, countMovies } from "../../services/movies";
 
 const Movies = () => {
   const history = useHistory();
@@ -15,9 +15,16 @@ const Movies = () => {
   };
 
   useEffect(() => {
-    getAllMovies()
+    countMovies()
       .then((response) => {
-        setMovies(response?.data);
+        const totalCount = response?.data;
+        getAllMovies(0, totalCount)
+          .then((response) => {
+            setMovies(response?.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         console.log(error);

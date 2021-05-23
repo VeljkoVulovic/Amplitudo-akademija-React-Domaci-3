@@ -4,7 +4,7 @@ import Wrapper from "../../components/wrapper/Wrapper";
 import { Button } from "@material-ui/core";
 import { useHistory, Link } from "react-router-dom";
 import AddBoxIcon from "@material-ui/icons/AddBox";
-import { getAllCharacters } from "../../services/characters";
+import { getAllCharacters, countCharacters } from "../../services/characters";
 
 const Characters = () => {
   const history = useHistory();
@@ -15,9 +15,16 @@ const Characters = () => {
   };
 
   useEffect(() => {
-    getAllCharacters()
+    countCharacters()
       .then((response) => {
-        setCharacters(response?.data);
+        const totalCount = response?.data;
+        getAllCharacters(0, totalCount)
+          .then((response) => {
+            setCharacters(response?.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         console.log(error);

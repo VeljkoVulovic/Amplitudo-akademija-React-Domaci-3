@@ -1,7 +1,7 @@
 import axiosInstance from "./axios";
 
-export const getAllBooks = () => {
-  return axiosInstance.get("books", {
+export const getAllBooks = (page, size) => {
+  return axiosInstance.get("books?page=" + page + "&size=" + size, {
     headers: { Authorization: `Bearer ${localStorage.getItem("jwt-token")}` },
   });
 };
@@ -26,6 +26,12 @@ export const addBook = (data) => {
 
 export const editBook = (data) => {
   return axiosInstance.put(`books`, data, {
+    headers: { Authorization: `Bearer ${localStorage.getItem("jwt-token")}` },
+  });
+};
+
+export const countBooks = () => {
+  return axiosInstance.get("books/count", {
     headers: { Authorization: `Bearer ${localStorage.getItem("jwt-token")}` },
   });
 };

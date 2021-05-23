@@ -1,7 +1,7 @@
 import axiosInstance from "./axios";
 
-export const getAllMovies = () => {
-  return axiosInstance.get("movies", {
+export const getAllMovies = (page, size) => {
+  return axiosInstance.get("movies?page=" + page + "&size=" + size, {
     headers: { Authorization: `Bearer ${localStorage.getItem("jwt-token")}` },
   });
 };
@@ -26,6 +26,12 @@ export const addMovie = (data) => {
 
 export const editMovie = (data) => {
   return axiosInstance.put(`movies`, data, {
+    headers: { Authorization: `Bearer ${localStorage.getItem("jwt-token")}` },
+  });
+};
+
+export const countMovies = () => {
+  return axiosInstance.get("movies/count", {
     headers: { Authorization: `Bearer ${localStorage.getItem("jwt-token")}` },
   });
 };
