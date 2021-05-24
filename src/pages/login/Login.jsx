@@ -38,7 +38,7 @@ const Login = () => {
 
   return (
     <Container>
-      <div className="styleDiv centerDiv">
+      <form className="styleDiv centerDiv">
         <h1>Welcome!</h1>
         <div>
           <TextField
@@ -104,7 +104,7 @@ const Login = () => {
         {errorMessage !== "" ? (
           <div className="errorMessage">{errorMessage}</div>
         ) : null}
-      </div>
+      </form>
     </Container>
   );
 };

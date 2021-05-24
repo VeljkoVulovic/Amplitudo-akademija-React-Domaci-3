@@ -23,6 +23,7 @@ import {
   addCharacter,
 } from "../../services/characters";
 import DeleteModal from "../../components/modal/DeleteModal";
+import { useMutation, useQueryClient } from "react-query";
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -41,6 +42,21 @@ const FormCharacter = (props) => {
   const [gender, setGender] = useState("");
   const [occupation, setOccupation] = useState("");
   const classes = useStyles();
+  const queryClient = useQueryClient();
+
+  const mutationEdit = useMutation((data) => editCharacter(data), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("characters");
+      history.push("/characters");
+    },
+  });
+
+  const mutationAdd = useMutation((data) => addCharacter(data), {
+    onSuccess: () => {
+      queryClient.invalidateQueries("characters");
+      history.push("/characters");
+    },
+  });
 
   const handleChange = (event) => {
     setGender(event.target.value);
@@ -74,22 +90,10 @@ const FormCharacter = (props) => {
       occupation: occupation,
     };
     if (character != null) {
-      editCharacter(formData)
-        .then((response) => {
-          history.push("/characters");
-        })
-        .catch((error) => {
-          console.log(error?.response?.data);
-        });
+      mutationEdit.mutate(formData);
     } else {
       delete formData.id;
-      addCharacter(formData)
-        .then((response) => {
-          history.push("/characters");
-        })
-        .catch((error) => {
-          console.log(error?.response?.data);
-        });
+      mutationAdd.mutate(formData);
     }
   };
 
@@ -104,7 +108,7 @@ const FormCharacter = (props) => {
   };
 
   return (
-    <div className="styleDiv formDiv">
+    <form className="styleDiv formDiv">
       <div>
         <TextField
           style={{ width: "100%" }}
@@ -206,7 +210,7 @@ const FormCharacter = (props) => {
       {character != null ? (
         <DeleteModal onDelete={onDelete} name={firstName} id={id}></DeleteModal>
       ) : null}
-    </div>
+    </form>
   );
 };
 

@@ -86,7 +86,7 @@ const FormBook = (props) => {
   };
 
   return (
-    <div className="styleDiv formDiv">
+    <form className="styleDiv formDiv">
       <div>
         <TextField
           style={{ width: "100%" }}
@@ -167,7 +167,7 @@ const FormBook = (props) => {
       {book != null ? (
         <DeleteModal onDelete={onDelete} name={isbn} id={id}></DeleteModal>
       ) : null}
-    </div>
+    </form>
   );
 };
 
