@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -11,16 +11,18 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import Button from "@material-ui/core/Button";
 import { withRouter, useHistory } from "react-router-dom";
 import "./Navbar.css";
+import { account } from "../../services/account";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
   menuButton: {
-    marginRight: theme.spacing(2),
+    marginRight: 20,
   },
   title: {
     flexGrow: 1,
+  },
+  user: {
+    marginRight: 20,
+    fontSize: 17
   },
 }));
 
@@ -29,6 +31,7 @@ const Navbar = () => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const [user, setUser] = useState("");
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -39,8 +42,18 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
+  useEffect(() => {
+    account()
+      .then(function (response) {
+        setUser(response?.data?.login);
+      })
+      .catch(function (error) {
+        setUser("");
+      });
+  }, []);
+
   return (
-    <div className={classes.root}>
+    <div>
       <AppBar color="primary" position="sticky">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
@@ -87,6 +100,9 @@ const Navbar = () => {
                 Movies
               </MenuItem>
             </Menu>
+            <Typography variant="h7" className={classes.user}>
+              <b>User</b> : <i>{user}</i>
+            </Typography>
             <Button
               startIcon={<ExitToAppIcon />}
               className="logout transition"

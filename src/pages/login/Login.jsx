@@ -8,7 +8,6 @@ import {
   FormControlLabel,
 } from "@material-ui/core";
 import { login } from "../../services/account";
-import "./Login.css";
 
 const Login = () => {
   const history = useHistory();
@@ -99,6 +98,16 @@ const Login = () => {
             onClick={(e) => onLogin(e)}
           >
             Login
+          </Button>
+        </div>
+        <div className="buttonDiv">
+          <Button
+            fullWidth
+            variant="outlined"
+            color="primary"
+            onClick={() => history.push("/register")}
+          >
+            Register
           </Button>
         </div>
         {errorMessage !== "" ? (

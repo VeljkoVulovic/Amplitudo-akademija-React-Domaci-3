@@ -2,6 +2,7 @@ import { Switch } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import Login from "./pages/login/Login";
+import Register from "./pages/register/Register";
 import PrivateRoute from "./privateRoute/PrivateRoute";
 import Characters from "./pages/characters/Characters";
 import Movies from "./pages/movies/Movies";
@@ -19,6 +20,7 @@ function App() {
       <div>
         <Switch>
           <PrivateRoute path={["/", "/login"]} exact component={Login} />
+          <PrivateRoute path="/register" exact component={Register} />
           <PrivateRoute
             path="/characters"
             exact
