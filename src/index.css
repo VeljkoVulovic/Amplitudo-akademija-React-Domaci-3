@@ -132,6 +132,11 @@ a {
   background-image: url("https://i.imgur.com/GnyDvKN.png");
 }
 
+.errorSpan {
+  color: rgb(187, 0, 0);
+  text-align: center;
+}
+
 @media (max-width: 700px) {
   .styleDiv {
     width: 250px;

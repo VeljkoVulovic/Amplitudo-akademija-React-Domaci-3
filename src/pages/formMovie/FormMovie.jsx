@@ -4,8 +4,14 @@ import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import SaveIcon from "@material-ui/icons/Save";
 import KeyboardReturnIcon from "@material-ui/icons/KeyboardReturn";
-import { deleteMovie, editMovie, addMovie } from "../../services/movies";
+import {
+  deleteMovie,
+  editMovie,
+  addMovie,
+  getMovie,
+} from "../../services/movies";
 import DeleteModal from "../../components/modal/DeleteModal";
+import { useForm } from "react-hook-form";
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -13,40 +19,44 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const initialData = {
+  directorName: "",
+  duration: 0,
+  id: 0,
+  name: "",
+  rating: 0,
+  writerName: "",
+};
+
 const FormMovie = (props) => {
-  const movie = props.location.movie;
   const history = useHistory();
-  const [id, setId] = useState(0);
-  const [name, setName] = useState("");
-  const [directorName, setDirectorName] = useState("");
-  const [writerName, setWriterName] = useState("");
-  const [duration, setDuration] = useState(0);
-  const [rating, setRating] = useState(0);
+  const movie = props.location.movie;
+  const [formData, setFormData] = useState(initialData);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const classes = useStyles();
 
   useEffect(() => {
-    if (movie != null) {
-      setId(movie.id);
-      setName(movie.name);
-      setDirectorName(movie.directorName);
-      setWriterName(movie.writerName);
-      setDuration(movie.duration);
-      setRating(movie.rating);
+    if (movie !== undefined) {
+      getMovie(movie.id).then((response) => {
+        console.log(response?.data);
+        setFormData(response?.data);
+      });
     }
   }, [movie]);
 
-  const onSave = (e) => {
-    e.preventDefault();
-    const formData = {
-      directorName: directorName,
-      duration: duration,
-      id: id,
-      name: name,
-      rating: rating,
-      writerName: writerName,
-    };
-    if (movie != null) {
-      editMovie(formData)
+  const onError = (errors) => {
+    console.log(errors);
+  };
+
+  const onSubmit = (data) => {
+    console.log(data);
+    if (movie !== undefined) {
+      data.id = movie.id;
+      editMovie(data)
         .then((response) => {
           history.push("/movies");
         })
@@ -54,8 +64,8 @@ const FormMovie = (props) => {
           console.log(error?.response?.data);
         });
     } else {
-      delete formData.id;
-      addMovie(formData)
+      delete data.id;
+      addMovie(data)
         .then((response) => {
           history.push("/movies");
         })
@@ -76,7 +86,15 @@ const FormMovie = (props) => {
   };
 
   return (
-    <div className="styleDiv formDiv">
+    <form
+      className="styleDiv formDiv"
+      onSubmit={handleSubmit(onSubmit, onError)}
+    >
+      {movie !== undefined ? (
+        <h2>Edit movie {movie.id}</h2>
+      ) : (
+        <h2>Add movie</h2>
+      )}
       <div>
         <TextField
           style={{ width: "100%" }}
@@ -84,9 +102,14 @@ const FormMovie = (props) => {
           variant="outlined"
           label="Name"
           autoComplete="off"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          {...register("name", {
+            required: {
+              value: true,
+              message: "Please input name!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.name?.message}</span>
       </div>
       <div>
         <TextField
@@ -95,9 +118,14 @@ const FormMovie = (props) => {
           variant="outlined"
           label="Director name"
           autoComplete="off"
-          value={directorName}
-          onChange={(e) => setDirectorName(e.target.value)}
+          {...register("directorName", {
+            required: {
+              value: true,
+              message: "Please input director name!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.directorName?.message}</span>
       </div>
       <div>
         <TextField
@@ -106,9 +134,14 @@ const FormMovie = (props) => {
           variant="outlined"
           label="Writer name"
           autoComplete="off"
-          value={writerName}
-          onChange={(e) => setWriterName(e.target.value)}
+          {...register("writerName", {
+            required: {
+              value: true,
+              message: "Please input writer name!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.writerName?.message}</span>
       </div>
       <div>
         <TextField
@@ -117,9 +150,14 @@ const FormMovie = (props) => {
           variant="outlined"
           label="Duration"
           autoComplete="off"
-          value={duration}
-          onChange={(e) => setDuration(e.target.value)}
+          {...register("duration", {
+            required: {
+              value: true,
+              message: "Please input duration!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.duration?.message}</span>
       </div>
       <div>
         <TextField
@@ -128,9 +166,14 @@ const FormMovie = (props) => {
           variant="outlined"
           label="Rating"
           autoComplete="off"
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
+          {...register("rating", {
+            required: {
+              value: true,
+              message: "Please input rating!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.duration?.message}</span>
       </div>
       <Button
         style={{ width: "112px" }}
@@ -138,9 +181,9 @@ const FormMovie = (props) => {
         variant="contained"
         startIcon={<SaveIcon />}
         color="primary"
-        onClick={(e) => onSave(e)}
+        type="submit"
       >
-        Save
+        Submit
       </Button>
       <Button
         startIcon={<KeyboardReturnIcon />}
@@ -150,10 +193,14 @@ const FormMovie = (props) => {
       >
         Return
       </Button>
-      {movie != null ? (     
-        <DeleteModal onDelete={onDelete} name={name} id={id}></DeleteModal>
+      {movie !== undefined ? (
+        <DeleteModal
+          onDelete={onDelete}
+          name={"movie " + formData?.id}
+          id={formData?.id}
+        ></DeleteModal>
       ) : null}
-    </div>
+    </form>
   );
 };
 

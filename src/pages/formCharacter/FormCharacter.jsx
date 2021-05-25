@@ -1,29 +1,18 @@
 import React, { useState, useEffect } from "react";
-import {
-  TextField,
-  Button,
-  InputLabel,
-  MenuItem,
-  Select,
-  FormControl,
-} from "@material-ui/core";
+import { TextField, Button } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import SaveIcon from "@material-ui/icons/Save";
 import KeyboardReturnIcon from "@material-ui/icons/KeyboardReturn";
-import DateFnsUtils from "@date-io/date-fns";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
-import "date-fns";
 import {
   deleteCharacter,
   editCharacter,
   addCharacter,
+  getCharacter,
 } from "../../services/characters";
 import DeleteModal from "../../components/modal/DeleteModal";
 import { useMutation, useQueryClient } from "react-query";
+import { useForm } from "react-hook-form";
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -31,18 +20,27 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const initialData = {
+  age: 0,
+  dateOfBirth: "",
+  firstName: "",
+  gender: "",
+  id: 0,
+  lastName: "",
+  occupation: "",
+};
+
 const FormCharacter = (props) => {
   const character = props.location.character;
   const history = useHistory();
-  const [id, setId] = useState(0);
-  const [age, setAge] = useState(0);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState(null);
-  const [gender, setGender] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const classes = useStyles();
   const queryClient = useQueryClient();
+  const [formData, setFormData] = useState(initialData);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const classes = useStyles();
 
   const mutationEdit = useMutation((data) => editCharacter(data), {
     onSuccess: () => {
@@ -58,42 +56,26 @@ const FormCharacter = (props) => {
     },
   });
 
-  const handleChange = (event) => {
-    setGender(event.target.value);
-  };
-
-  const handleDateChange = (date) => {
-    setDateOfBirth(date);
-  };
-
   useEffect(() => {
-    if (character != null) {
-      setId(character.id);
-      setAge(character.age);
-      setFirstName(character.firstName);
-      setLastName(character.lastName);
-      setDateOfBirth(character.dateOfBirth);
-      setGender(character.gender);
-      setOccupation(character.occupation);
+    if (character !== undefined) {
+      getCharacter(character.id).then((response) => {
+        setFormData(response?.data);
+      });
     }
   }, [character]);
 
-  const onSave = (e) => {
-    e.preventDefault();
-    const formData = {
-      age: age,
-      dateOfBirth: dateOfBirth,
-      firstName: firstName,
-      gender: gender,
-      id: id,
-      lastName: lastName,
-      occupation: occupation,
-    };
-    if (character != null) {
-      mutationEdit.mutate(formData);
+  const onError = (errors) => {
+    console.log(errors);
+  };
+
+  const onSubmit = (data) => {
+    console.log(data);
+    if (character !== undefined) {
+      data.id = character.id;
+      mutationEdit.mutate(data);
     } else {
-      delete formData.id;
-      mutationAdd.mutate(formData);
+      delete data.id;
+      mutationAdd.mutate(data);
     }
   };
 
@@ -108,7 +90,15 @@ const FormCharacter = (props) => {
   };
 
   return (
-    <form className="styleDiv formDiv">
+    <form
+      className="styleDiv formDiv"
+      onSubmit={handleSubmit(onSubmit, onError)}
+    >
+      {character !== undefined ? (
+        <h2>Edit character {character.id}</h2>
+      ) : (
+        <h2>Add character</h2>
+      )}
       <div>
         <TextField
           style={{ width: "100%" }}
@@ -116,9 +106,14 @@ const FormCharacter = (props) => {
           variant="outlined"
           label="First name"
           autoComplete="off"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
+          {...register("firstName", {
+            required: {
+              value: true,
+              message: "Please input first name!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.firstName?.message}</span>
       </div>
       <div>
         <TextField
@@ -127,9 +122,14 @@ const FormCharacter = (props) => {
           variant="outlined"
           label="Last name"
           autoComplete="off"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
+          {...register("lastName", {
+            required: {
+              value: true,
+              message: "Please input last name!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.lastName?.message}</span>
       </div>
       <div>
         <TextField
@@ -138,30 +138,30 @@ const FormCharacter = (props) => {
           variant="outlined"
           label="Age"
           autoComplete="off"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
+          {...register("age", {
+            required: {
+              value: true,
+              message: "Please input age!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.age?.message}</span>
       </div>
       <div>
-        <FormControl
+        <TextField
           style={{ width: "100%" }}
+          type="text"
           variant="outlined"
-          className={classes.formControl}
-        >
-          <InputLabel id="demo-simple-select-outlined-label">Gender</InputLabel>
-          <Select
-            style={{ width: "100%" }}
-            labelId="demo-simple-select-outlined-label"
-            id="demo-simple-select-outlined"
-            value={gender}
-            onChange={handleChange}
-            label="Gender"
-          >
-            <MenuItem value={"MALE"}>Male</MenuItem>
-            <MenuItem value={"FEMALE"}>Female</MenuItem>
-            <MenuItem value={"OTHER"}>Other</MenuItem>
-          </Select>
-        </FormControl>
+          label="Gender"
+          autoComplete="off"
+          {...register("gender", {
+            required: {
+              value: true,
+              message: "Please input Gender (MALE / FEMALE / OTHER)!",
+            },
+          })}
+        />
+        <span className="errorSpan">{errors?.gender?.message}</span>
       </div>
       <div>
         <TextField
@@ -170,24 +170,30 @@ const FormCharacter = (props) => {
           variant="outlined"
           label="Occupation"
           autoComplete="off"
-          value={occupation}
-          onChange={(e) => setOccupation(e.target.value)}
+          {...register("occupation", {
+            required: {
+              value: true,
+              message: "Please input occupation",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.occupation?.message}</span>
       </div>
-      <div className="datePicker">
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <KeyboardDatePicker
-            style={{ width: "100%" }}
-            margin="normal"
-            label="Date of birth"
-            format="yyyy-MM-dd"
-            value={dateOfBirth}
-            onChange={handleDateChange}
-            KeyboardButtonProps={{
-              "aria-label": "change date",
-            }}
-          />
-        </MuiPickersUtilsProvider>
+      <div>
+        <TextField
+          style={{ width: "100%" }}
+          type="text"
+          variant="outlined"
+          label="Date of birth"
+          autoComplete="off"
+          {...register("dateOfBirth", {
+            required: {
+              value: true,
+              message: "Please input date of birth (format yyyy-mm-dd)!",
+            },
+          })}
+        />
+        <span className="errorSpan">{errors?.dateOfBirth?.message}</span>
       </div>
       <Button
         style={{ width: "112px" }}
@@ -195,9 +201,9 @@ const FormCharacter = (props) => {
         variant="contained"
         color="primary"
         startIcon={<SaveIcon />}
-        onClick={(e) => onSave(e)}
+        type="submit"
       >
-        Save
+        Submit
       </Button>
       <Button
         startIcon={<KeyboardReturnIcon />}
@@ -207,8 +213,12 @@ const FormCharacter = (props) => {
       >
         Return
       </Button>
-      {character != null ? (
-        <DeleteModal onDelete={onDelete} name={firstName} id={id}></DeleteModal>
+      {character !== undefined ? (
+        <DeleteModal
+          onDelete={onDelete}
+          name={"character " + formData?.id}
+          id={formData?.id}
+        ></DeleteModal>
       ) : null}
     </form>
   );

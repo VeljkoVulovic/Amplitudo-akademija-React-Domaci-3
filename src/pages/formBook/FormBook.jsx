@@ -4,14 +4,9 @@ import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import SaveIcon from "@material-ui/icons/Save";
 import KeyboardReturnIcon from "@material-ui/icons/KeyboardReturn";
-import { deleteBook, editBook, addBook } from "../../services/books";
-import DateFnsUtils from "@date-io/date-fns";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
-import "date-fns";
+import { deleteBook, editBook, addBook, getBook } from "../../services/books";
 import DeleteModal from "../../components/modal/DeleteModal";
+import { useForm } from "react-hook-form";
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -19,44 +14,30 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const initialData = {
+  genre: "",
+  id: 0,
+  isbn: "",
+  publishedDate: "",
+  publisherName: "",
+  writerName: "",
+};
+
 const FormBook = (props) => {
-  const book = props.location.book;
   const history = useHistory();
-  const [id, setId] = useState(0);
-  const [isbn, setIsbn] = useState("");
-  const [writerName, setWriterName] = useState("");
-  const [publisherName, setPublisherName] = useState("");
-  const [publishedDate, setPublishedDate] = useState(null);
-  const [genre, setGenre] = useState("");
+  const book = props.location.book;
+  const [formData, setFormData] = useState(initialData);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const classes = useStyles();
 
-  const handleDateChange = (date) => {
-    setPublishedDate(date);
-  };
-
-  useEffect(() => {
-    if (book != null) {
-      setId(book.id);
-      setIsbn(book.isbn);
-      setWriterName(book.writerName);
-      setPublisherName(book.publisherName);
-      setPublishedDate(book.publishedDate);
-      setGenre(book.genre);
-    }
-  }, [book]);
-
-  const onSave = (e) => {
-    e.preventDefault();
-    const formData = {
-      genre: genre,
-      id: id,
-      isbn: isbn,
-      publishedDate: publishedDate,
-      publisherName: publisherName,
-      writerName: writerName,
-    };
-    if (book != null) {
-      editBook(formData)
+  const onSubmit = (data) => {
+    console.log(data);
+    if (book !== undefined) {
+      editBook(data)
         .then((response) => {
           history.push("/books");
         })
@@ -64,8 +45,8 @@ const FormBook = (props) => {
           console.log(error?.response?.data);
         });
     } else {
-      delete formData.id;
-      addBook(formData)
+      delete data.id;
+      addBook(data)
         .then((response) => {
           history.push("/books");
         })
@@ -73,6 +54,19 @@ const FormBook = (props) => {
           console.log(error?.response?.data);
         });
     }
+  };
+
+  useEffect(() => {
+    if (book !== undefined) {
+      getBook(book.id).then((response) => {
+        console.log(response?.data);
+        setFormData(response?.data);
+      });
+    }
+  }, [book]);
+
+  const onError = (errors) => {
+    console.log(errors);
   };
 
   const onDelete = (id) => {
@@ -86,7 +80,11 @@ const FormBook = (props) => {
   };
 
   return (
-    <form className="styleDiv formDiv">
+    <form
+      className="styleDiv formDiv"
+      onSubmit={handleSubmit(onSubmit, onError)}
+    >
+      {book !== undefined ? <h2>Edit book {book.id}</h2> : <h2>Add book</h2>}
       <div>
         <TextField
           style={{ width: "100%" }}
@@ -94,9 +92,14 @@ const FormBook = (props) => {
           label="Isbn"
           variant="outlined"
           autoComplete="off"
-          value={isbn}
-          onChange={(e) => setIsbn(e.target.value)}
+          {...register("isbn", {
+            required: {
+              value: true,
+              message: "Please input isbn!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.isbn?.message}</span>
       </div>
       <div>
         <TextField
@@ -105,9 +108,14 @@ const FormBook = (props) => {
           variant="outlined"
           label="Writer name"
           autoComplete="off"
-          value={writerName}
-          onChange={(e) => setWriterName(e.target.value)}
+          {...register("writerName", {
+            required: {
+              value: true,
+              message: "Please input writer name!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.writerName?.message}</span>
       </div>
       <div>
         <TextField
@@ -116,9 +124,30 @@ const FormBook = (props) => {
           variant="outlined"
           label="Publisher name"
           autoComplete="off"
-          value={publisherName}
-          onChange={(e) => setPublisherName(e.target.value)}
+          {...register("publisherName", {
+            required: {
+              value: true,
+              message: "Please input publisher name!",
+            },
+          })}
         />
+        <span className="errorSpan">{errors?.publisherName?.message}</span>
+      </div>
+      <div>
+        <TextField
+          style={{ width: "100%" }}
+          type="text"
+          variant="outlined"
+          label="Published date"
+          autoComplete="off"
+          {...register("publishedDate", {
+            required: {
+              value: true,
+              message: "Please input published date (format yyyy-mm-dd)!",
+            },
+          })}
+        />
+        <span className="errorSpan">{errors?.publishedDate?.message}</span>
       </div>
       <div>
         <TextField
@@ -127,24 +156,14 @@ const FormBook = (props) => {
           variant="outlined"
           label="Genre"
           autoComplete="off"
-          value={genre}
-          onChange={(e) => setGenre(e.target.value)}
+          {...register("genre", {
+            required: {
+              value: true,
+              message: "Please input genre!",
+            },
+          })}
         />
-      </div>
-      <div className="datePicker">
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <KeyboardDatePicker
-            style={{ width: "100%" }}
-            margin="normal"
-            label="Published date"
-            format="yyyy-MM-dd"
-            value={publishedDate}
-            onChange={handleDateChange}
-            KeyboardButtonProps={{
-              "aria-label": "change date",
-            }}
-          />
-        </MuiPickersUtilsProvider>
+        <span className="errorSpan">{errors?.genre?.message}</span>
       </div>
       <Button
         style={{ width: "112px" }}
@@ -152,9 +171,9 @@ const FormBook = (props) => {
         variant="contained"
         startIcon={<SaveIcon />}
         color="primary"
-        onClick={(e) => onSave(e)}
+        type="submit"
       >
-        Save
+        Submit
       </Button>
       <Button
         startIcon={<KeyboardReturnIcon />}
@@ -164,8 +183,12 @@ const FormBook = (props) => {
       >
         Return
       </Button>
-      {book != null ? (
-        <DeleteModal onDelete={onDelete} name={isbn} id={id}></DeleteModal>
+      {book !== undefined ? (
+        <DeleteModal
+          onDelete={onDelete}
+          name={"book " + formData?.id}
+          id={formData?.id}
+        ></DeleteModal>
       ) : null}
     </form>
   );
