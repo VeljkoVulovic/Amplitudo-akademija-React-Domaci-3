@@ -137,6 +137,12 @@ a {
   text-align: center;
 }
 
+input {
+  margin-right: 10px;
+  width: 15px;
+  height: 15px;
+}
+
 @media (max-width: 700px) {
   .styleDiv {
     width: 250px;

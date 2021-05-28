@@ -9,12 +9,14 @@ export const login = (data) => {
   });
 };
 
-export const register = (data) => {
+export const registerUser = (data) => {
+  const newData = { authorities: ["ROLE_USER"], langKey: "en", ...data };
+  console.log(newData);
   return axios({
     method: "POST",
     baseURL: "http://localhost:8080/api/",
     url: "/register",
-    data: data,
+    data: newData,
   });
 };
 

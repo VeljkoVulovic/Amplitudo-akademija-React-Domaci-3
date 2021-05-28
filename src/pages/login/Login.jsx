@@ -4,40 +4,43 @@ import {
   Container,
   TextField,
   Button,
-  Checkbox,
   FormControlLabel,
 } from "@material-ui/core";
 import { login } from "../../services/account";
+import { useForm } from "react-hook-form";
 
 const Login = () => {
   const history = useHistory();
-  const [loginData, setLoginData] = useState({
-    username: "",
-    password: "",
-    rememberMe: false,
-  });
   const [errorMessage, setErrorMessage] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  const onLogin = (e) => {
-    e.preventDefault();
-    login(loginData)
+  const onSubmit = (data) => {
+    console.log(data);
+    login(data)
       .then(function (response) {
         localStorage.setItem("jwt-token", response?.data["id_token"]);
         history.push("/movies");
       })
       .catch(function (error) {
         console.log(error?.response?.data);
-        if (error?.response?.data?.details === "Bad credientials") {
-          setErrorMessage("Pogresni kredencijali!");
-        } else {
-          setErrorMessage("Doslo je do greske!");
-        }
+        setErrorMessage(error?.response?.data?.title);
       });
+  };
+
+  const onError = (errors) => {
+    console.log(errors);
   };
 
   return (
     <Container>
-      <form className="styleDiv centerDiv">
+      <form
+        className="styleDiv centerDiv"
+        onSubmit={handleSubmit(onSubmit, onError)}
+      >
         <h1>Welcome!</h1>
         <div>
           <TextField
@@ -45,16 +48,14 @@ const Login = () => {
             variant="outlined"
             label="Username"
             autoComplete="off"
-            value={loginData?.username}
-            onChange={(e) =>
-              setLoginData((prevState) => {
-                return {
-                  ...prevState,
-                  username: e.target.value,
-                };
-              })
-            }
+            {...register("username", {
+              required: {
+                value: true,
+                message: "Please input username!",
+              },
+            })}
           />
+          <span className="errorSpan">{errors?.username?.message}</span>
         </div>
         <div>
           <TextField
@@ -62,41 +63,21 @@ const Login = () => {
             variant="outlined"
             label="Password"
             autoComplete="off"
-            value={loginData?.password}
-            onChange={(e) =>
-              setLoginData((prevState) => {
-                return {
-                  ...prevState,
-                  password: e.target.value,
-                };
-              })
-            }
+            {...register("password", {
+              required: {
+                value: true,
+                message: "Please input password!",
+              },
+            })}
           />
+          <span className="errorSpan">{errors?.password?.message}</span>
         </div>
         <FormControlLabel
-          control={
-            <Checkbox
-              checked={loginData?.rememberMe}
-              onChange={(e) =>
-                setLoginData((prevState) => {
-                  return {
-                    ...prevState,
-                    rememberMe: e.target.checked,
-                  };
-                })
-              }
-              color="primary"
-            />
-          }
           label="Remember me"
+          control={<input type="checkbox" {...register("rememberMe")} />}
         />
         <div className="buttonDiv">
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            onClick={(e) => onLogin(e)}
-          >
+          <Button fullWidth variant="contained" color="primary" type="submit">
             Login
           </Button>
         </div>

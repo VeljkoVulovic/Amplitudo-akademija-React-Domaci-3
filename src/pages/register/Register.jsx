@@ -1,37 +1,39 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Container, TextField, Button } from "@material-ui/core";
-import { register } from "../../services/account";
+import { registerUser } from "../../services/account";
 import KeyboardReturnIcon from "@material-ui/icons/KeyboardReturn";
+import { useForm } from "react-hook-form";
 
 const Login = () => {
   const history = useHistory();
-  const [registerData, setRegisterData] = useState({
-    langKey: "en",
-    authorities: ["ROLE_USER"],
-    email: "",
-    firstName: "",
-    lastName: "",
-    login: "",
-    password: "",
-  });
   const [errorMessage, setErrorMessage] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  const onRegister = (e) => {
-    e.preventDefault();
-    register(registerData)
+  const onSubmit = (data) => {
+    registerUser(data)
       .then(function (response) {
         history.push("/login");
       })
       .catch(function (error) {
-        console.log(error?.response?.data);
-        setErrorMessage("Doslo je do greske!");
+        setErrorMessage(error?.response?.data?.title);
       });
+  };
+
+  const onError = (errors) => {
+    console.log(errors.title);
   };
 
   return (
     <Container>
-      <form className="styleDiv centerDiv">
+      <form
+        className="styleDiv centerDiv"
+        onSubmit={handleSubmit(onSubmit, onError)}
+      >
         <h1>Register</h1>
         <div>
           <TextField
@@ -39,16 +41,14 @@ const Login = () => {
             variant="outlined"
             label="First name"
             autoComplete="off"
-            value={registerData?.firstName}
-            onChange={(e) =>
-              setRegisterData((prevState) => {
-                return {
-                  ...prevState,
-                  firstName: e.target.value,
-                };
-              })
-            }
+            {...register("firstName", {
+              required: {
+                value: true,
+                message: "Please input first name!",
+              },
+            })}
           />
+          <span className="errorSpan">{errors?.username?.message}</span>
         </div>
         <div>
           <TextField
@@ -56,16 +56,14 @@ const Login = () => {
             variant="outlined"
             label="Last name"
             autoComplete="off"
-            value={registerData?.lastName}
-            onChange={(e) =>
-              setRegisterData((prevState) => {
-                return {
-                  ...prevState,
-                  lastName: e.target.value,
-                };
-              })
-            }
+            {...register("lastName", {
+              required: {
+                value: true,
+                message: "Please input last name!",
+              },
+            })}
           />
+          <span className="errorSpan">{errors?.password?.message}</span>
         </div>
         <div>
           <TextField
@@ -73,16 +71,14 @@ const Login = () => {
             variant="outlined"
             label="E-mail"
             autoComplete="off"
-            value={registerData?.email}
-            onChange={(e) =>
-              setRegisterData((prevState) => {
-                return {
-                  ...prevState,
-                  email: e.target.value,
-                };
-              })
-            }
+            {...register("email", {
+              required: {
+                value: true,
+                message: "Please input email!",
+              },
+            })}
           />
+          <span className="errorSpan">{errors?.password?.message}</span>
         </div>
         <div>
           <TextField
@@ -90,16 +86,14 @@ const Login = () => {
             variant="outlined"
             label="Username"
             autoComplete="off"
-            value={registerData?.login}
-            onChange={(e) =>
-              setRegisterData((prevState) => {
-                return {
-                  ...prevState,
-                  login: e.target.value,
-                };
-              })
-            }
+            {...register("login", {
+              required: {
+                value: true,
+                message: "Please input username!",
+              },
+            })}
           />
+          <span className="errorSpan">{errors?.username?.message}</span>
         </div>
         <div>
           <TextField
@@ -107,24 +101,17 @@ const Login = () => {
             variant="outlined"
             label="Password"
             autoComplete="off"
-            value={registerData?.password}
-            onChange={(e) =>
-              setRegisterData((prevState) => {
-                return {
-                  ...prevState,
-                  password: e.target.value,
-                };
-              })
-            }
+            {...register("password", {
+              required: {
+                value: true,
+                message: "Please input password!",
+              },
+            })}
           />
+          <span className="errorSpan">{errors?.password?.message}</span>
         </div>
         <div className="buttonDiv">
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            onClick={(e) => onRegister(e)}
-          >
+          <Button fullWidth variant="contained" color="primary" type="submit">
             Register
           </Button>
         </div>
