@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const Character = ({
   firstName,
@@ -35,3 +36,11 @@ const Character = ({
 };
 
 export default Character;
+
+Character.propTypes = {
+  firstName: PropTypes.string,
+  lastName: PropTypes.string,
+  gender: PropTypes.string,
+  age: PropTypes.number,
+  occupation: PropTypes.string,
+};

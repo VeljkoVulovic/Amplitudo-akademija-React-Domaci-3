@@ -41,11 +41,15 @@ const FormCharacter = (props) => {
     formState: { errors },
   } = useForm();
   const classes = useStyles();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const mutationEdit = useMutation((data) => editCharacter(data), {
     onSuccess: () => {
       queryClient.invalidateQueries("characters");
       history.push("/characters");
+    },
+    onError: (error) => {
+      setErrorMessage(error?.response?.data?.title);
     },
   });
 
@@ -53,6 +57,9 @@ const FormCharacter = (props) => {
     onSuccess: () => {
       queryClient.invalidateQueries("characters");
       history.push("/characters");
+    },
+    onError: (error) => {
+      setErrorMessage(error?.response?.data?.title);
     },
   });
 
@@ -219,6 +226,9 @@ const FormCharacter = (props) => {
           name={"character " + formData?.id}
           id={formData?.id}
         ></DeleteModal>
+      ) : null}
+      {errorMessage !== "" ? (
+        <div className="errorMessage">{errorMessage}</div>
       ) : null}
     </form>
   );

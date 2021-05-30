@@ -33,6 +33,7 @@ const FormBook = (props) => {
     formState: { errors },
   } = useForm();
   const classes = useStyles();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const onSubmit = (data) => {
     console.log(data);
@@ -43,6 +44,7 @@ const FormBook = (props) => {
         })
         .catch((error) => {
           console.log(error?.response?.data);
+          setErrorMessage(error?.response?.data?.title);
         });
     } else {
       delete data.id;
@@ -52,6 +54,7 @@ const FormBook = (props) => {
         })
         .catch((error) => {
           console.log(error?.response?.data);
+          setErrorMessage(error?.response?.data?.title);
         });
     }
   };
@@ -189,6 +192,9 @@ const FormBook = (props) => {
           name={"book " + formData?.id}
           id={formData?.id}
         ></DeleteModal>
+      ) : null}
+      {errorMessage !== "" ? (
+        <div className="errorMessage">{errorMessage}</div>
       ) : null}
     </form>
   );

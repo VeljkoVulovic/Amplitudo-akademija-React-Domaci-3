@@ -1,34 +1,74 @@
+import React, { Suspense } from "react";
 import { Switch } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
-import Login from "./pages/login/Login";
-import Register from "./pages/register/Register";
 import PrivateRoute from "./privateRoute/PrivateRoute";
-import Characters from "./pages/characters/Characters";
-import Movies from "./pages/movies/Movies";
-import Books from "./pages/books/Books";
 import FormMovie from "./pages/formMovie/FormMovie";
 import FormCharacter from "./pages/formCharacter/FormCharacter";
 import FormBook from "./pages/formBook/FormBook";
+// import { ReactQueryDevtools } from "react-query/devtools";
+
+const Login = React.lazy(() => import("./pages/login/Login"));
+const Register = React.lazy(() => import("./pages/register/Register"));
+const Characters = React.lazy(() => import("./pages/characters/Characters"));
+const Movies = React.lazy(() => import("./pages/movies/Movies"));
+const Books = React.lazy(() => import("./pages/books/Books"));
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       <div>
         <Switch>
-          <PrivateRoute path={["/", "/login"]} exact component={Login} />
-          <PrivateRoute path="/register" exact component={Register} />
+          <PrivateRoute
+            path={["/", "/login"]}
+            exact
+            component={() => (
+              <Suspense fallback={<div>Loading...</div>}>
+                <Login />
+              </Suspense>
+            )}
+          />
+          <PrivateRoute
+            path="/register"
+            exact
+            component={() => (
+              <Suspense fallback={<div>Loading...</div>}>
+                <Register />
+              </Suspense>
+            )}
+          />
           <PrivateRoute
             path="/characters"
             exact
-            component={Characters}
+            component={() => (
+              <Suspense fallback={<div>Loading...</div>}>
+                <Characters />
+              </Suspense>
+            )}
             isPrivate
           />
-          <PrivateRoute path="/movies" exact component={Movies} isPrivate />
-          <PrivateRoute path="/books" exact component={Books} isPrivate />
+          <PrivateRoute
+            path="/movies"
+            exact
+            component={() => (
+              <Suspense fallback={<div>Loading...</div>}>
+                <Movies />
+              </Suspense>
+            )}
+            isPrivate
+          />
+          <PrivateRoute
+            path="/books"
+            exact
+            component={() => (
+              <Suspense fallback={<div>Loading...</div>}>
+                <Books />
+              </Suspense>
+            )}
+            isPrivate
+          />
           <PrivateRoute
             path="/formMovie"
             exact

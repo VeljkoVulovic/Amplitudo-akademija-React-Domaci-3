@@ -38,6 +38,7 @@ const FormMovie = (props) => {
     formState: { errors },
   } = useForm();
   const classes = useStyles();
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     if (movie !== undefined) {
@@ -62,6 +63,7 @@ const FormMovie = (props) => {
         })
         .catch((error) => {
           console.log(error?.response?.data);
+          setErrorMessage(error?.response?.data?.title);
         });
     } else {
       delete data.id;
@@ -71,6 +73,7 @@ const FormMovie = (props) => {
         })
         .catch((error) => {
           console.log(error?.response?.data);
+          setErrorMessage(error?.response?.data?.title);
         });
     }
   };
@@ -199,6 +202,9 @@ const FormMovie = (props) => {
           name={"movie " + formData?.id}
           id={formData?.id}
         ></DeleteModal>
+      ) : null}
+      {errorMessage !== "" ? (
+        <div className="errorMessage">{errorMessage}</div>
       ) : null}
     </form>
   );

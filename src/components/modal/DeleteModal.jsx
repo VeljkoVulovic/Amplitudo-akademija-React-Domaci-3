@@ -5,6 +5,7 @@ import Fade from "@material-ui/core/Fade";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Button } from "@material-ui/core";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -79,3 +80,9 @@ const DeleteModal = ({ onDelete, name, id }) => {
 };
 
 export default DeleteModal;
+
+DeleteModal.propTypes = {
+  name: PropTypes.string,
+  id: PropTypes.number,
+  onDelete: PropTypes.func,
+};

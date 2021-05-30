@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const Movie = ({ name, directorName, writerName, duration, rating }) => {
   return (
@@ -26,3 +27,11 @@ const Movie = ({ name, directorName, writerName, duration, rating }) => {
 };
 
 export default Movie;
+
+Movie.propTypes = {
+  name: PropTypes.string,
+  directorName: PropTypes.string,
+  writerName: PropTypes.string,
+  duration: PropTypes.number,
+  rating: PropTypes.number,
+};
